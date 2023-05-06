@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md-sandbox
-# MAGIC 
+# MAGIC
 # MAGIC <div style="text-align: center; line-height: 0; padding-top: 9px;">
 # MAGIC   <img src="https://databricks.com/wp-content/uploads/2018/03/db-academy-rgb-1200px.png" alt="Databricks Learning" style="width: 600px">
 # MAGIC </div>
@@ -9,12 +9,12 @@
 
 # DBTITLE 0,--i18n-68be35ae-f2b3-48b3-b07b-de55f9ff8e80
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC # Ingesting Data Lab
-# MAGIC 
+# MAGIC
 # MAGIC Read in CSV files containing products data.
-# MAGIC 
+# MAGIC
 # MAGIC ##### Tasks
 # MAGIC 1. Read with infer schema
 # MAGIC 2. Read with user-defined schema
@@ -29,8 +29,8 @@
 
 # DBTITLE 0,--i18n-47817139-7b7a-456a-8218-2b1e08939f25
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### 1. Read with infer schema
 # MAGIC - View the first CSV file using DBUtils method **`fs.head`** with the filepath provided in the variable **`single_product_cs_file_path`**
 # MAGIC - Create **`products_df`** by reading from CSV files located in the filepath provided in the variable **`products_csv_path`**
@@ -40,10 +40,12 @@
 
 # TODO
 single_product_csv_file_path = f"{DA.paths.datasets}/products/products.csv/part-00000-tid-1663954264736839188-daf30e86-5967-4173-b9ae-d1481d3506db-2367-1-c000.csv"
-print(FILL_IN)
+print(dbutils.fs.head(single_product_csv_file_path))
 
 products_csv_path = f"{DA.paths.datasets}/products/products.csv"
-products_df = FILL_IN
+products_df = (spark.read
+.option("inferSchema",True)
+.option("header",True).csv(products_csv_path))
 
 products_df.printSchema()
 
@@ -51,9 +53,9 @@ products_df.printSchema()
 
 # DBTITLE 0,--i18n-4e08ac30-1f0e-4993-988a-2ed5024a3aa1
 # MAGIC %md
-# MAGIC 
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
+# MAGIC
 # MAGIC **1.1: CHECK YOUR WORK**
 
 # COMMAND ----------
@@ -65,25 +67,35 @@ print("All test pass")
 
 # DBTITLE 0,--i18n-10dd820e-d462-4e1f-a0cd-4010a7e38031
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### 2. Read with user-defined schema
 # MAGIC Define schema by creating a **`StructType`** with column names and data types
 
 # COMMAND ----------
 
 # TODO
-user_defined_schema = FILL_IN
+from pyspark.sql.types import LongType, StringType, StructType, StructField, FloatType
 
-products_df2 = FILL_IN
+user_defined_schema = StructType([
+    StructField("item_id", StringType(), True),
+    StructField("name", StringType(), True),
+    StructField("price", FloatType(), True)
+])
+
+products_csv_path = f"{DA.paths.datasets}/products/products.csv"
+
+products_df2 = (spark.read
+.schema(user_defined_schema)
+.option("header",True).csv(products_csv_path))
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-2286f55e-fbdc-409c-a9cb-ea224c9e6134
 # MAGIC %md
-# MAGIC 
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
+# MAGIC
 # MAGIC **2.1: CHECK YOUR WORK**
 
 # COMMAND ----------
@@ -105,24 +117,26 @@ print("All test pass")
 
 # DBTITLE 0,--i18n-1a03df94-e3ca-47c7-900f-80b300d8e015
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### 3. Read with DDL formatted string
 
 # COMMAND ----------
 
 # TODO
-ddl_schema = FILL_IN
+ddl_schema = "item_id string, name string, price float"
 
-products_df3 = FILL_IN
+products_df3 = (spark.read
+.schema(ddl_schema)
+.option("header",True).csv(products_csv_path))
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-7b00eee9-66c4-4e05-a531-a978df61a8a4
 # MAGIC %md
-# MAGIC 
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
+# MAGIC
 # MAGIC **3.1: CHECK YOUR WORK**
 
 # COMMAND ----------
@@ -134,9 +148,9 @@ print("All test pass")
 
 # DBTITLE 0,--i18n-74b30474-083a-4001-bd1f-bd6e3aa1c2b6
 # MAGIC %md
-# MAGIC 
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
+# MAGIC
 # MAGIC ### 4. Write to Delta
 # MAGIC Write **`products_df`** to the filepath provided in the variable **`products_output_path`**
 
@@ -144,15 +158,15 @@ print("All test pass")
 
 # TODO
 products_output_path = f"{DA.paths.working_dir}/delta/products"
-products_df.FILL_IN
+products_df.write.format("delta").save(products_output_path)
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-9ea56c39-7402-46ec-9c46-c197ddcc1082
 # MAGIC %md
-# MAGIC 
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
+# MAGIC
 # MAGIC **4.1: CHECK YOUR WORK**
 
 # COMMAND ----------
@@ -175,8 +189,8 @@ print("All test pass")
 
 # DBTITLE 0,--i18n-1a76214d-7eff-4297-85cf-0ebc7fb02605
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### Clean up classroom
 
 # COMMAND ----------
