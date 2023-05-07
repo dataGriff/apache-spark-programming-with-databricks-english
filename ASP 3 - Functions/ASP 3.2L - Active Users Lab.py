@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md-sandbox
-# MAGIC 
+# MAGIC
 # MAGIC <div style="text-align: center; line-height: 0; padding-top: 9px;">
 # MAGIC   <img src="https://databricks.com/wp-content/uploads/2018/03/db-academy-rgb-1200px.png" alt="Databricks Learning" style="width: 600px">
 # MAGIC </div>
@@ -9,8 +9,8 @@
 
 # DBTITLE 0,--i18n-f71eff64-cf6e-469a-ab37-a297936c4980
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC # Active Users Lab
 # MAGIC Plot daily active users and average active users by day of week.
 # MAGIC 1. Extract timestamp and date of events
@@ -26,8 +26,8 @@
 
 # DBTITLE 0,--i18n-3a6a78da-1772-441e-b73a-eff2e82561bb
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### Setup
 # MAGIC Run the cell below to create the starting DataFrame of user IDs and timestamps of events logged on the BedBricks website.
 
@@ -48,8 +48,8 @@ display(df)
 
 # DBTITLE 0,--i18n-7fa26321-781b-4633-bce4-5b86082adbcc
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### 1. Extract timestamp and date of events
 # MAGIC - Convert **`ts`** from microseconds to seconds by dividing by 1 million and cast to timestamp
 # MAGIC - Add **`date`** column by converting **`ts`** to date
@@ -57,7 +57,8 @@ display(df)
 # COMMAND ----------
 
 # TODO
-datetime_df = (df.FILL_IN
+datetime_df = df.withColumn("ts", (col("ts") / 1e6).cast("timestamp")).withColumn(
+    "date", col("ts").cast("date")
 )
 display(datetime_df)
 
@@ -65,9 +66,9 @@ display(datetime_df)
 
 # DBTITLE 0,--i18n-50e248b0-9067-4ec0-b633-1862739315f1
 # MAGIC %md
-# MAGIC 
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
+# MAGIC
 # MAGIC **1.1: CHECK YOUR WORK**
 
 # COMMAND ----------
@@ -97,8 +98,8 @@ print("All test pass")
 
 # DBTITLE 0,--i18n-cffda679-267e-4934-9316-f33d68f1fff6
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### 2. Get daily active users
 # MAGIC - Group by date
 # MAGIC - Aggregate approximate count of distinct **`user_id`** and alias to "active_users"
@@ -108,8 +109,8 @@ print("All test pass")
 
 # COMMAND ----------
 
-# TODO
-active_users_df = (datetime_df.FILL_IN
+from pyspark.sql.functions import approx_count_distinct
+active_users_df = (datetime_df.groupBy("date").agg(approx_count_distinct("user_id").alias("active_users")).orderBy(col("date"))
 )
 display(active_users_df)
 
@@ -117,9 +118,9 @@ display(active_users_df)
 
 # DBTITLE 0,--i18n-168eed92-68bf-4966-98b6-f92bc44fbe67
 # MAGIC %md
-# MAGIC 
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
+# MAGIC
 # MAGIC **2.1: CHECK YOUR WORK**
 
 # COMMAND ----------
@@ -147,8 +148,8 @@ print("All test pass")
 
 # DBTITLE 0,--i18n-ac71e88e-aa3d-4032-8741-876f0d8ff8da
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### 3. Get average number of active users by day of week
 # MAGIC - Add **`day`** column by extracting day of week from **`date`** using a datetime pattern string - the expected output here will be a day name, not a number (e.g. **`Mon`**, not **`1`**)
 # MAGIC - Group by **`day`**
@@ -156,18 +157,22 @@ print("All test pass")
 
 # COMMAND ----------
 
-# TODO
-active_dow_df = (active_users_df.FILL_IN
-)
+from pyspark.sql.functions import date_format, avg
+
+active_dow_df = active_users_df.withColumn(
+    "day",
+    date_format(col("date"), "E")).groupBy(
+        "day").agg(avg(col("active_users")).alias("avg_users"))
+
 display(active_dow_df)
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-889c1b5c-f870-45d0-8cc0-5e1c58f6640e
 # MAGIC %md
-# MAGIC 
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
+# MAGIC
 # MAGIC **3.1: CHECK YOUR WORK**
 
 # COMMAND ----------
@@ -195,8 +200,8 @@ print("All test pass")
 
 # DBTITLE 0,--i18n-f4b41974-87d7-47fe-81f8-93fd5c99fbe1
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### Clean up classroom
 
 # COMMAND ----------

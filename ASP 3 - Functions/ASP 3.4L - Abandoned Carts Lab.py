@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md-sandbox
-# MAGIC 
+# MAGIC
 # MAGIC <div style="text-align: center; line-height: 0; padding-top: 9px;">
 # MAGIC   <img src="https://databricks.com/wp-content/uploads/2018/03/db-academy-rgb-1200px.png" alt="Databricks Learning" style="width: 600px">
 # MAGIC </div>
@@ -9,8 +9,8 @@
 
 # DBTITLE 0,--i18n-4ddb1d34-621f-4f23-8b3d-f6180f1bb7c2
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC # Abandoned Carts Lab
 # MAGIC Get abandoned cart items for email without purchases.
 # MAGIC 1. Get emails of converted users from transactions
@@ -18,7 +18,7 @@
 # MAGIC 3. Get cart item history for each user
 # MAGIC 4. Join cart item history with emails
 # MAGIC 5. Filter for emails with abandoned cart items
-# MAGIC 
+# MAGIC
 # MAGIC ##### Methods
 # MAGIC - <a href="https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.join.html#pyspark.sql.DataFrame.join" target="_blank">DataFrame</a>: **`join`**
 # MAGIC - <a href="https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/functions.html" target="_blank">Built-In Functions</a>: **`collect_set`**, **`explode`**, **`lit`**
@@ -28,8 +28,8 @@
 
 # DBTITLE 0,--i18n-2b181f29-66cc-4e06-bb94-5ac965a1e8ca
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### Setup
 # MAGIC Run the cells below to create DataFrames **`sales_df`**, **`users_df`**, and **`events_df`**.
 
@@ -59,12 +59,12 @@ display(events_df)
 
 # DBTITLE 0,--i18n-b0a89a88-a4ad-4fea-a2a3-b132f042d256
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### 1: Get emails of converted users from transactions
 # MAGIC - Select the **`email`** column in **`sales_df`** and remove duplicates
 # MAGIC - Add a new column **`converted`** with the boolean **`True`** for all rows
-# MAGIC 
+# MAGIC
 # MAGIC Save the result as **`converted_users_df`**.
 
 # COMMAND ----------
@@ -72,7 +72,7 @@ display(events_df)
 # TODO
 from pyspark.sql.functions import *
 
-converted_users_df = (sales_df.FILL_IN
+converted_users_df = (sales_df.select("email").dropDuplicates().withColumn("converted",lit(True))
                      )
 display(converted_users_df)
 
@@ -80,10 +80,10 @@ display(converted_users_df)
 
 # DBTITLE 0,--i18n-29604628-777b-499c-81ef-3a0a02fba146
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC #### 1.1: Check Your Work
-# MAGIC 
+# MAGIC
 # MAGIC Run the following cell to verify that your solution works:
 
 # COMMAND ----------
@@ -103,19 +103,19 @@ print("All test pass")
 
 # DBTITLE 0,--i18n-7921ccc0-93ff-480d-b47b-1ec5225f1d70
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### 2: Join emails with user IDs
 # MAGIC - Perform an outer join on **`converted_users_df`** and **`users_df`** with the **`email`** field
 # MAGIC - Filter for users where **`email`** is not null
 # MAGIC - Fill null values in **`converted`** as **`False`**
-# MAGIC 
+# MAGIC
 # MAGIC Save the result as **`conversions_df`**.
 
 # COMMAND ----------
 
 # TODO
-conversions_df = (users_df.FILL_IN
+conversions_df = (users_df.join(converted_users_df,"email","outer").filter(col("email").isNotNull()).na.fill(False)
                  )
 display(conversions_df)
 
@@ -123,10 +123,10 @@ display(conversions_df)
 
 # DBTITLE 0,--i18n-4e3a3a42-719c-4e54-8ac7-242a7d4c1149
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC #### 2.1: Check Your Work
-# MAGIC 
+# MAGIC
 # MAGIC Run the following cell to verify that your solution works:
 
 # COMMAND ----------
@@ -150,19 +150,19 @@ print("All test pass")
 
 # DBTITLE 0,--i18n-ea3dc5ec-1f2a-4887-88a0-053f91ff981d
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### 3: Get cart item history for each user
 # MAGIC - Explode the **`items`** field in **`events_df`** with the results replacing the existing **`items`** field
 # MAGIC - Group by **`user_id`**
 # MAGIC   - Collect a set of all **`items.item_id`** objects for each user and alias the column to "cart"
-# MAGIC 
+# MAGIC
 # MAGIC Save the result as **`carts_df`**.
 
 # COMMAND ----------
 
-# TODO
-carts_df = (events_df.FILL_IN
+from pyspark.sql.functions import explode
+carts_df = (events_df.withColumn("items",explode("items")).groupBy("user_id").agg(collect_set("items.item_id").alias("cart"))
 )
 display(carts_df)
 
@@ -170,10 +170,10 @@ display(carts_df)
 
 # DBTITLE 0,--i18n-46fe477b-c8da-4b9a-983c-89cf8d2c9ae3
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC #### 3.1: Check Your Work
-# MAGIC 
+# MAGIC
 # MAGIC Run the following cell to verify that your solution works:
 
 # COMMAND ----------
@@ -193,27 +193,27 @@ print("All test pass")
 
 # DBTITLE 0,--i18n-6cd1dfc6-79dc-41a4-aaab-4678010f4937
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### 4: Join cart item history with emails
 # MAGIC - Perform a left join on **`conversions_df`** and **`carts_df`** on the **`user_id`** field
-# MAGIC 
+# MAGIC
 # MAGIC Save result as **`email_carts_df`**.
 
 # COMMAND ----------
 
 # TODO
-email_carts_df = conversions_df.FILL_IN
+email_carts_df = conversions_df.join(carts_df,"user_id","left")
 display(email_carts_df)
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-993e55d9-76aa-4772-b5ce-078b2cc18a2e
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC #### 4.1: Check Your Work
-# MAGIC 
+# MAGIC
 # MAGIC Run the following cell to verify that your solution works:
 
 # COMMAND ----------
@@ -235,29 +235,30 @@ print("All test pass")
 
 # DBTITLE 0,--i18n-bfb161e8-f598-4907-9176-b3ebd7906075
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### 5: Filter for emails with abandoned cart items
 # MAGIC - Filter **`email_carts_df`** for users where **`converted`** is False
 # MAGIC - Filter for users with non-null carts
-# MAGIC 
+# MAGIC
 # MAGIC Save result as **`abandoned_carts_df`**.
 
 # COMMAND ----------
 
 # TODO
-abandoned_carts_df = (email_carts_df.FILL_IN
+abandoned_carts_df = (email_carts_df.filter((col("converted") == False) & (col("cart").isNotNull()))
 )
 display(abandoned_carts_df)
+abandoned_carts_df.count()
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-36dee8eb-e975-4db1-b4d6-ad3b9cf3e3bd
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC #### 5.1: Check Your Work
-# MAGIC 
+# MAGIC
 # MAGIC Run the following cell to verify that your solution works:
 
 # COMMAND ----------
@@ -275,15 +276,15 @@ print("All test pass")
 
 # DBTITLE 0,--i18n-913e5176-9e31-4b70-a5fb-e4d7dddde6d8
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### 6: Bonus Activity
 # MAGIC Plot number of abandoned cart items by product
 
 # COMMAND ----------
 
 # TODO
-abandoned_items_df = (abandoned_carts_df.FILL_IN
+abandoned_items_df = (abandoned_carts_df.select(explode("cart").alias("items")).groupBy("items").count()
                      )
 display(abandoned_items_df)
 
@@ -291,10 +292,10 @@ display(abandoned_items_df)
 
 # DBTITLE 0,--i18n-47be8a6d-17cd-4e34-b1cb-e85d7bf7a710
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC #### 6.1: Check Your Work
-# MAGIC 
+# MAGIC
 # MAGIC Run the following cell to verify that your solution works:
 
 # COMMAND ----------
@@ -316,8 +317,8 @@ print("All test pass")
 
 # DBTITLE 0,--i18n-75c53b88-3ac3-4dc2-9b99-e3a08e48c5f1
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### Clean up classroom
 
 # COMMAND ----------
