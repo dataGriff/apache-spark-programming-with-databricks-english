@@ -49,14 +49,14 @@
 # COMMAND ----------
 
 # This is a Python cell. You can run normal Python code here...
-print 'The sum of 1 and 1 is {0}'.format(1+1)
+print ('The sum of 1 and 1 is {0}'.format(1+1))
 
 # COMMAND ----------
 
 # Here is another Python cell, this time with a variable (x) declaration and an if statement:
 x = 42
 if x > 40:
-    print 'The sum of 1 and 2 is {0}'.format(1+2)
+    print ('The sum of 1 and 2 is {0}'.format(1+2))
 
 # COMMAND ----------
 
@@ -69,7 +69,7 @@ if x > 40:
 
 # This cell relies on x being defined already.
 # If we didn't run the cells from part (1a) this code would fail.
-print x * 2
+print (x * 2)
 
 # COMMAND ----------
 
@@ -89,7 +89,7 @@ m.group(0)
 
 # Import the datetime library
 import datetime
-print 'This was last run on: {0}'.format(datetime.datetime.now())
+print ('This was last run on: {0}'.format(datetime.datetime.now()))
 
 # COMMAND ----------
 
@@ -215,6 +215,10 @@ help(map)
 
 # COMMAND ----------
 
+pip install faker
+
+# COMMAND ----------
+
 from faker import Factory
 fake = Factory.create()
 fake.seed(4321)
@@ -239,7 +243,7 @@ def fake_entry():
 
 # Create a helper function to call a function repeatedly
 def repeat(times, func, *args, **kwargs):
-    for _ in xrange(times):
+    for _ in range(times):
         yield func(*args, **kwargs)
 
 # COMMAND ----------
@@ -299,7 +303,7 @@ dataDF = sqlContext.createDataFrame(data, ('last_name', 'first_name', 'ssn', 'oc
 
 # COMMAND ----------
 
-print 'type of dataDF: {0}'.format(type(dataDF))
+print ('type of dataDF: {0}'.format(type(dataDF)))
 
 # COMMAND ----------
 
@@ -406,7 +410,7 @@ subDF.explain(True)
 
 # Let's collect the data
 results = subDF.collect()
-print results
+print (results)
 
 # COMMAND ----------
 
@@ -450,8 +454,8 @@ display(subDF)
 
 # COMMAND ----------
 
-print dataDF.count()
-print subDF.count()
+print (dataDF.count())
+print (subDF.count())
 
 # COMMAND ----------
 
@@ -520,9 +524,9 @@ evenDF.count()
 
 # COMMAND ----------
 
-print "first: {0}\n".format(filteredDF.first())
+print ("first: {0}\n".format(filteredDF.first()))
 
-print "Four of them: {0}\n".format(filteredDF.take(4))
+print ("Four of them: {0}\n".format(filteredDF.take(4)))
 
 # COMMAND ----------
 
@@ -582,8 +586,8 @@ display(dataDF.orderBy('age').take(5))
 
 # COMMAND ----------
 
-print dataDF.count()
-print dataDF.distinct().count()
+print (dataDF.count())
+print (dataDF.distinct().count())
 
 # COMMAND ----------
 
@@ -614,8 +618,8 @@ tempDF.distinct().show()
 
 # COMMAND ----------
 
-print dataDF.count()
-print dataDF.dropDuplicates(['first_name', 'last_name']).count()
+print (dataDF.count())
+print (dataDF.dropDuplicates(['first_name', 'last_name']).count())
 
 # COMMAND ----------
 
@@ -659,8 +663,8 @@ dataDF.groupBy().avg('age').show(truncate=False)
 
 # COMMAND ----------
 
-print "Maximum age: {0}".format(dataDF.groupBy().max('age').first()[0])
-print "Minimum age: {0}".format(dataDF.groupBy().min('age').first()[0])
+print ("Maximum age: {0}".format(dataDF.groupBy().max('age').first()[0]))
+print ("Minimum age: {0}".format(dataDF.groupBy().min('age').first()[0]))
 
 # COMMAND ----------
 
@@ -672,12 +676,12 @@ print "Minimum age: {0}".format(dataDF.groupBy().min('age').first()[0])
 # COMMAND ----------
 
 sampledDF = dataDF.sample(withReplacement=False, fraction=0.10)
-print sampledDF.count()
+print (sampledDF.count())
 sampledDF.show()
 
 # COMMAND ----------
 
-print dataDF.sample(withReplacement=False, fraction=0.05).count()
+print (dataDF.sample(withReplacement=False, fraction=0.05).count())
 
 # COMMAND ----------
 
@@ -700,9 +704,9 @@ print dataDF.sample(withReplacement=False, fraction=0.05).count()
 # Cache the DataFrame
 filteredDF.cache()
 # Trigger an action
-print filteredDF.count()
+print (filteredDF.count())
 # Check if it is cached
-print filteredDF.is_cached
+print (filteredDF.is_cached)
 
 # COMMAND ----------
 
@@ -718,7 +722,7 @@ print filteredDF.is_cached
 # If we are done with the DataFrame we can unpersist it so that its memory can be reclaimed
 filteredDF.unpersist()
 # Check if it is cached
-print filteredDF.is_cached
+print (filteredDF.is_cached)
 
 # COMMAND ----------
 
